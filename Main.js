@@ -1,14 +1,19 @@
 let canvas = document.querySelector('canvas')
- canvas.width = innerWidth;
- canvas.height = innerHeight;
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 let ctx = canvas.getContext('2d');
-const player = new Player ();
+let player = new Player ();
 let bullet = [];
 let enemy = [];
-// let particles = []
+function init () {
+    player = new Player ();
+    bullet = [];
+    enemy = [];
+    score = 0;
+}
 function spawmEnemies () {
     setInterval(() => {
-        let r = Math.random()*(30-10) +10;
+        let r = 40;
         let x
         let y
         if (Math.random()<0.5) {
@@ -29,6 +34,8 @@ function spawmEnemies () {
 
 }
 let score = 0;
+let  playSound = new  Audio('DduduDdudu-BLACKPINK-6291998.mp3')
+
 function animate () {
     let animationID = requestAnimationFrame(animate)
     ctx.fillStyle = 'rgba(0,0,0,0.1)'
@@ -51,19 +58,30 @@ function animate () {
             let distant = Math.hypot(canvas.width/2 - Enemies.position.x, canvas.height/2 - Enemies.position.y);
             if (distant - Enemies.r - player.r < 0) {
                 cancelAnimationFrame(animationID)
-            }
-            bullet.forEach((bull, bulletIndex) => {
-                let distant = Math.hypot(bull.x - Enemies.position.x, bull.y - Enemies.position.y);
-                if (distant - Enemies.r - 5 < 0) {
-                    score += 100;
-                    document.getElementById('scoreDis').innerHTML = score;
-                    setTimeout(() => {
-                        enemy.splice(enemyIndex, 1)
-                        bullet.splice(bulletIndex, 1)
-                    }, 0)
-                }
 
-            })
+                let choice = confirm('Your score is: ' + score + '. Are you want replay')
+                console.log(choice)
+                if (choice === true) {
+                    restartGame()
+                } else {
+                    window.stop()
+                    alert('See you again')
+                    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+                }
+            }
+                bullet.forEach((bull, bulletIndex) => {
+                    let distant = Math.hypot(bull.x - Enemies.position.x, bull.y - Enemies.position.y);
+                    if (distant - Enemies.r - 5 < 0) {
+                        score += 100;
+                        document.getElementById('scoreDis').innerHTML = score;
+                        setTimeout(() => {
+                            enemy.splice(enemyIndex, 1)
+                            bullet.splice(bulletIndex, 1)
+                        }, 0)
+                    }
+
+                })
         })
     }
 addEventListener('click', (evt) => {
@@ -78,10 +96,19 @@ addEventListener('click', (evt) => {
         canvas.width/2,
         canvas.height/2,
         5,
-        'white',
+        'black',
         velocity)
     )
     console.log(bullet)
 })
-spawmEnemies()
-animate();
+let choicePlay = confirm('Are you want play game?')
+if ( choicePlay === true) {
+    playSound.play()
+    spawmEnemies()
+    animate();
+}
+function restartGame () {
+    init()
+    spawmEnemies()
+    animate();
+}
